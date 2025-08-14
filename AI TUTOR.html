@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Tutor Dashboard</title>
+    <style>
+        body { font-family: sans-serif; margin: 20px; }
+        #chatbox { border: 1px solid #ccc; height: 300px; overflow-y: scroll; padding: 10px; margin-bottom: 10px; }
+        .message { margin-bottom: 5px; }
+        .user { text-align: right; color: blue; }
+        .ai { text-align: left; color: green; }
+    </style>
+</head>
+<body>
+    <h1>AI Tutor Dashboard</h1>
+
+    <!-- AI Icon -->
+    <img src="C:\Users\urk23cs1131\Desktop\robo.jpg" 
+         alt="AI Tutor" width="80" style="display:block; margin-bottom:10px;">
+
+    <div id="chatbox"></div>
+    <input type="text" id="questionInput" placeholder="Ask your question...">
+    <button onclick="askQuestion()">Send</button>
+
+    <script>
+        async function askQuestion() {
+            const questionInput = document.getElementById('questionInput');
+            const question = questionInput.value.trim();
+
+            if (question) {
+                appendMessage('user', question);
+                questionInput.value = '';
+
+                try {
+                    const response = await fetch('/ask', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify({ question: question })
+                    });
+                    const data = await response.json();
+                    appendMessage('ai', data.answer);
+                } catch (error) {
+                    console.error('Error:', error);
+                    appendMessage('ai', 'Oops! Something went wrong.');
+                }
+            }
+        }
+
+        function appendMessage(sender, text) {
+            const chatbox = document.getElementById('chatbox');
+            const messageDiv = document.createElement('div');
+            messageDiv.classList.add('message', sender);
+            messageDiv.textContent = text;
+            chatbox.appendChild(messageDiv);
+            chatbox.scrollTop = chatbox.scrollHeight; // Scroll to bottom
+        }
+
+        // Insert one simple example question and answer on load
+        appendMessage('user', 'What is HTML?');
+        appendMessage('ai', 'HTML stands for HyperText Markup Language. It is used to structure content on the web.');
+    </script>
+</body>
+</html>
+
